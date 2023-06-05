@@ -1,17 +1,15 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.DuplicateException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.model.User;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class UserRepositoryInMemory implements UserRepository {
-    private final HashMap<Long, User> userMap = new HashMap<>();
+    private final Map<Long, User> userMap = new HashMap<>();
     private final Set<String> emails = new HashSet<>();
     private Long id = 0L;
 
@@ -38,7 +36,7 @@ public class UserRepositoryInMemory implements UserRepository {
 
     @Override
     public List<User> getAllUsers() {
-        return List.copyOf(userMap.values());
+        return new ArrayList<>(userMap.values());
     }
 
     @Override

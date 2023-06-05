@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -7,11 +7,12 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
 public class ItemRepositoryInMemory implements ItemRepository {
-    private final HashMap<Long, Item> itemMap = new HashMap<>();
+    private final Map<Long, Item> itemMap = new HashMap<>();
     private Long id = 0L;
 
     @Override

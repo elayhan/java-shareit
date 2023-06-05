@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.coyote.Request;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 @Data
 @AllArgsConstructor
