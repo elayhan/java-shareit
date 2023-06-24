@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -18,27 +19,41 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         User user = userMapper.toUser(userDto);
-        return userMapper.toUserDto(repository.createUser(user));
+        return userMapper.toUserDto(repository.save(user));
     }
 
     @Override
     public UserDto getUser(Long id) {
-        return userMapper.toUserDto(repository.getUser(id));
+        return userMapper.toUserDto(getUserFromRepository(id));
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userMapper.toListUserDto(repository.getAllUsers());
+        return userMapper.toListUserDto(repository.findAll());
     }
 
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
-        User updUser = userMapper.toUser(userDto);
-        return userMapper.toUserDto(repository.updateUser(id, updUser));
+
+        User updUser = getUserFromRepository(id);
+        if (userDto.getEmail() != null) {
+            updUser.setEmail(userDto.getEmail());
+        }
+
+        if (userDto.getName() != null) {
+            updUser.setName(userDto.getName());
+        }
+
+        return userMapper.toUserDto(repository.save(updUser));
+    }
+
+    private User getUserFromRepository(Long id) {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 
     @Override
     public void deleteUser(Long id) {
-        repository.deleteUser(id);
+        repository.deleteById(id);
     }
+
 }
