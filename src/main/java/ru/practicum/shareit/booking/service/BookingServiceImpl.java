@@ -84,16 +84,13 @@ public class BookingServiceImpl implements BookingService {
         Map<String, Supplier<List<BookingDto>>> strategyMap = Map.of(
                 "ALL", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdOrderByStartDesc(userId))
-                ,
+                                .findAllByBookerIdOrderByStartDesc(userId)),
                 "CURRENT", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now))
-                ,
+                                .findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now)),
                 "PAST", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, now))
-                ,
+                                .findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, now)),
                 "FUTURE", () ->
                         mapper.toListBookingDto(repository
                                 .findAllByBookerIdAndStartAfterOrderByStartDesc(userId, now)),
