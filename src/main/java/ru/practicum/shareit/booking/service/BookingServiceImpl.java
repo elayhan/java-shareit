@@ -18,6 +18,9 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -77,46 +80,63 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getAllBookingsByState(Long userId, String state) {
         getUser(userId);
         LocalDateTime now = LocalDateTime.now();
-        switch (state) {
-            case "ALL":
-                return mapper.toListBookingDto(repository.findAllByBookerIdOrderByStartDesc(userId));
-            case "CURRENT":
-                return mapper.toListBookingDto(repository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now));
-            case "PAST":
-                return mapper.toListBookingDto(repository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, now));
-            case "FUTURE":
-                return mapper.toListBookingDto(repository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, now));
-            case "WAITING":
-                return mapper.toListBookingDto(repository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING));
-            case "REJECTED":
-                return mapper.toListBookingDto(repository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED));
-            default:
-                throw new NotSupportState("Unknown state: UNSUPPORTED_STATUS");
 
-        }
+        Map<String, Supplier<List<BookingDto>>> strategyMap = Map.of(
+                "ALL", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByBookerIdOrderByStartDesc(userId))
+                ,
+                "CURRENT", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now))
+                ,
+                "PAST", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, now))
+                ,
+                "FUTURE", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByBookerIdAndStartAfterOrderByStartDesc(userId, now)),
+                "WAITING", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING)),
+                "REJECTED", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED))
+        );
+
+
+        return Optional.ofNullable(strategyMap.get(state))
+                .orElseThrow(() -> new NotSupportState("Unknown state: UNSUPPORTED_STATUS")).get();
     }
 
     @Override
     public List<BookingDto> getAllBookingsByOwnedAndState(Long userId, String state) {
         getUser(userId);
         LocalDateTime now = LocalDateTime.now();
-        switch (state) {
-            case "ALL":
-                return mapper.toListBookingDto(repository.findAllByItemOwnerIdOrderByStartDesc(userId));
-            case "CURRENT":
-                return mapper.toListBookingDto(repository.findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now));
-            case "PAST":
-                return mapper.toListBookingDto(repository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now));
-            case "FUTURE":
-                return mapper.toListBookingDto(repository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now));
-            case "WAITING":
-                return mapper.toListBookingDto(repository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING));
-            case "REJECTED":
-                return mapper.toListBookingDto(repository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED));
-            default:
-                throw new NotSupportState("Unknown state: UNSUPPORTED_STATUS");
 
-        }
+        Map<String, Supplier<List<BookingDto>>> strategyMap = Map.of(
+                "ALL", () ->
+                        mapper.toListBookingDto(repository.findAllByItemOwnerIdOrderByStartDesc(userId)),
+                "CURRENT", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now)),
+                "PAST", () ->
+                        mapper.toListBookingDto(repository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now)),
+                "FUTURE", () ->
+                        mapper.toListBookingDto(repository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now)),
+                "WAITING", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING)),
+                "REJECTED", () ->
+                        mapper.toListBookingDto(repository
+                                .findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED))
+        );
+
+
+        return Optional.ofNullable(strategyMap.get(state))
+                .orElseThrow(() -> new NotSupportState("Unknown state: UNSUPPORTED_STATUS")).get();
+
     }
 
     private User getUser(Long userId) {
