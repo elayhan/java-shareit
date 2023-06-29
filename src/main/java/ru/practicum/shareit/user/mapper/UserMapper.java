@@ -14,4 +14,6 @@ public interface UserMapper {
     User toUser(UserDto userDto);
 
     List<UserDto> toListUserDto(Collection<User> users);
+
+    UserDto toUserDto(UserDto byId);
 }
