@@ -27,7 +27,7 @@ public class ItemRequestServiceTest {
 
     @Test
     void createRequestNoUserTest() {
-        assertThrows(NotFoundException.class, () -> service.createRequest(1l, new ItemRequestDto()));
+        assertThrows(NotFoundException.class, () -> service.createRequest(1L, new ItemRequestDto()));
     }
 
     @Test
