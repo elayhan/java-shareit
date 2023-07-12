@@ -101,7 +101,6 @@ public class BookingServiceImplUnitTest {
 
             bookingDto.setStart(LocalDateTime.of(2000, 1, 1, 0, 0));
             bookingDto.setEnd(LocalDateTime.of(2001, 1, 1, 1, 1));
-            
             assertThatThrownBy(() -> service.createBooking(1L, bookingDto))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("Вещь тю-тю");
