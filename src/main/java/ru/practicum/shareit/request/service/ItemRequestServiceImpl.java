@@ -56,7 +56,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         Pageable pageable = PageRequest.of(from, size);
         List<ItemRequestDto> itemRequestDtoList = mapper.toListItemRequestDto(repository
-                .findAllByRequestorIdNot(userId, pageable).toList());
+                .findAllByRequestorIdNot(userId, pageable));
 
         itemRequestDtoList.forEach(this::setItems);
 

@@ -34,7 +34,7 @@ public class ItemControllerTest {
     @MockBean
     private ItemService service;
 
-    ItemDto itemDto = ItemDto.builder()
+    private final ItemDto itemDto = ItemDto.builder()
             .id(1L)
             .name("name")
             .description("description")

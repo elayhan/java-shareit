@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.util.CustomJsonFormat;
 
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ public class ItemRequestDto {
     @NotEmpty(message = "Запрос не может быть пустым")
     private String description;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = CustomJsonFormat.PATTERN)
     private LocalDateTime created;
 
     private List<ItemDto> items;

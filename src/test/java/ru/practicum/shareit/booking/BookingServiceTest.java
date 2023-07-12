@@ -31,12 +31,11 @@ public class BookingServiceTest {
     private final UserService userService;
     private final ItemService itemService;
 
-    UserDto user;
-    ItemDto item;
+    private ItemDto item;
 
     @BeforeEach
     void beforeEach() {
-        user = userService.createUser(UserDto.builder()
+        UserDto user = userService.createUser(UserDto.builder()
                 .name("name")
                 .email("e@mail.com")
                 .build());
@@ -45,7 +44,6 @@ public class BookingServiceTest {
                 .owner(user.getId())
                 .available(true)
                 .build());
-
     }
 
     @Test
@@ -55,10 +53,7 @@ public class BookingServiceTest {
                 .email("a@mail.com")
                 .build());
 
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStart(LocalDateTime.now().minusMinutes(1));
-        bookingDto.setEnd(LocalDateTime.now().plusMinutes(20));
-        bookingDto.setItemId(item.getId());
+        BookingDto bookingDto = getBookingDto(LocalDateTime.now().minusMinutes(1), LocalDateTime.now().plusMinutes(2));
 
         BookingDto createdBooking = service.createBooking(2L, bookingDto);
 
@@ -68,6 +63,7 @@ public class BookingServiceTest {
         assertEquals(2L, createdBooking.getBooker().getId());
     }
 
+
     @Test
     void createBookingNotValidTimeTest() {
         userService.createUser(UserDto.builder()
@@ -75,20 +71,14 @@ public class BookingServiceTest {
                 .email("a@mail.com")
                 .build());
 
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStart(LocalDateTime.now().plusMinutes(3));
-        bookingDto.setEnd(LocalDateTime.now().plusMinutes(1));
-        bookingDto.setItemId(item.getId());
+        BookingDto bookingDto = getBookingDto(LocalDateTime.now().plusMinutes(3), LocalDateTime.now().plusMinutes(1));
 
         assertThrows(BadBookingTimeException.class, () -> service.createBooking(2L, bookingDto));
     }
 
     @Test
     void createBookingOwnerTest() {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStart(LocalDateTime.now().plusMinutes(1));
-        bookingDto.setEnd(LocalDateTime.now().plusMinutes(2));
-        bookingDto.setItemId(item.getId());
+        BookingDto bookingDto = getBookingDto(LocalDateTime.now().plusMinutes(1), LocalDateTime.now().plusMinutes(2));
 
         assertThrows(NotFoundException.class, () -> service.createBooking(1L, bookingDto));
     }
@@ -100,10 +90,7 @@ public class BookingServiceTest {
         item.setAvailable(false);
         itemService.updateItem(1L, 1L, item);
 
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStart(LocalDateTime.now().plusMinutes(1));
-        bookingDto.setEnd(LocalDateTime.now().plusMinutes(6));
-        bookingDto.setItemId(item.getId());
+        BookingDto bookingDto = getBookingDto(LocalDateTime.now().plusMinutes(1), LocalDateTime.now().plusMinutes(6));
         assertThrows(NotAvailableException.class, () -> service.createBooking(2L, bookingDto));
     }
 
@@ -161,11 +148,7 @@ public class BookingServiceTest {
                 .email("a@mail.com")
                 .build());
 
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStart(LocalDateTime.now().minusMinutes(3));
-        bookingDto.setEnd(LocalDateTime.now().minusMinutes(2));
-        bookingDto.setItemId(item.getId());
-
+        BookingDto bookingDto = getBookingDto(LocalDateTime.now().minusMinutes(3), LocalDateTime.now().minusMinutes(2));
         BookingDto createdBooking = service.createBooking(2L, bookingDto);
 
         List<BookingDto> bookings = service.getAllBookingsByState(2L, "PAST", 0, 10);
@@ -182,10 +165,8 @@ public class BookingServiceTest {
         List<BookingDto> bookings = service.getAllBookingsByState(2L, "FUTURE", 0, 10);
         assertEquals(0, bookings.size());
 
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStart(LocalDateTime.now().plusHours(1));
-        bookingDto.setEnd(LocalDateTime.now().plusHours(2));
-        bookingDto.setItemId(item.getId());
+        BookingDto bookingDto = getBookingDto(LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2));
 
         BookingDto createdBooking = service.createBooking(2L, bookingDto);
 
@@ -271,5 +252,13 @@ public class BookingServiceTest {
     void getAllBookingsByOwnedAndStateUnknownTest() {
         createBookingTest();
         assertThrows(NotSupportState.class, () -> service.getAllBookingsByOwnedAndState(1L, "UNK", 0, 10));
+    }
+
+    private BookingDto getBookingDto(LocalDateTime start, LocalDateTime end) {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStart(start);
+        bookingDto.setEnd(end);
+        bookingDto.setItemId(item.getId());
+        return bookingDto;
     }
 }

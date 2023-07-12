@@ -71,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getAllItems(Long userId, Integer from, Integer size) {
         getUser(userId);
         Pageable pageable = PageRequest.of(from, size);
-        List<ItemDto> items = itemMapper.toListItemDto(repository.findByOwnerId(userId, pageable).toList());
+        List<ItemDto> items = itemMapper.toListItemDto(repository.findByOwnerId(userId, pageable));
         items.forEach(itemDto -> {
             setBookings(userId, itemDto);
             setComments(itemDto);
@@ -103,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
 
         Pageable pageable = PageRequest.of(from, size);
 
-        return itemMapper.toListItemDto(repository.findByNameOrDescription(match, pageable).toList());
+        return itemMapper.toListItemDto(repository.findByNameOrDescription(match, pageable));
     }
 
     @Override

@@ -31,7 +31,7 @@ public class ItemServiceTest {
     private final ItemRequestService itemRequestService;
     private final BookingService bookingService;
 
-    ItemDto itemDto = ItemDto.builder()
+    private final ItemDto itemDto = ItemDto.builder()
             .name("item")
             .available(true)
             .build();
