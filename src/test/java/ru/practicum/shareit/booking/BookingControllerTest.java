@@ -103,7 +103,7 @@ public class BookingControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(mapper.writeValueAsString(bookingDto)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id", is(0)));
+                    .andExpect(jsonPath("$.id", is(bookingDto.getId().intValue())));
         }
 
     }
@@ -122,7 +122,7 @@ public class BookingControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(mapper.writeValueAsString(bookingDto)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id", is(0)))
+                    .andExpect(jsonPath("$.id", is(bookingDto.getId().intValue())))
                     .andExpect(jsonPath("$.status", is(BookingStatus.APPROVED.toString())));
         }
 
@@ -146,7 +146,7 @@ public class BookingControllerTest {
             mvc.perform(get(URL_TEMPLATE + "/{bookingId}", 1L)
                             .header(CustomHeader.USER_ID, 1L))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id", is((int) bookingDto.getId())));
+                    .andExpect(jsonPath("$.id", is(bookingDto.getId().intValue())));
         }
 
         @Test
@@ -212,6 +212,7 @@ public class BookingControllerTest {
 
     private static BookingDto getBookingDto() {
         BookingDto bookingDto = new BookingDto();
+        bookingDto.setId(1L);
         bookingDto.setStart(LocalDateTime.now().plusMinutes(1));
         bookingDto.setEnd(LocalDateTime.now().plusMinutes(2));
         bookingDto.setItemId(1L);
