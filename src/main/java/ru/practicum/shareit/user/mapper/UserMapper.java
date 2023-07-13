@@ -15,5 +15,4 @@ public interface UserMapper {
 
     List<UserDto> toListUserDto(Collection<User> users);
 
-    UserDto toUserDto(UserDto byId);
 }

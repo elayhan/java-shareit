@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -45,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (!item.getAvailable()) {
-            throw new NotAvailableException("Почему-то нельзя забронировать, забронированную вещь");
+            throw new NotAvailableException("Вещь не доступна для бронирования");
         }
 
         Booking booking = mapper.toBooking(bookingDto, item, user);
@@ -77,29 +79,31 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsByState(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByState(Long userId, String state, Integer from, Integer size) {
         getUser(userId);
         LocalDateTime now = LocalDateTime.now();
+
+        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size);
 
         Map<String, Supplier<List<BookingDto>>> strategyMap = Map.of(
                 "ALL", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdOrderByStartDesc(userId)),
+                                .findAllByBookerIdOrderByStartDesc(userId, pageable)),
                 "CURRENT", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now)),
+                                .findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now, pageable)),
                 "PAST", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, now)),
+                                .findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, now, pageable)),
                 "FUTURE", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdAndStartAfterOrderByStartDesc(userId, now)),
+                                .findAllByBookerIdAndStartAfterOrderByStartDesc(userId, now, pageable)),
                 "WAITING", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING)),
+                                .findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING, pageable)),
                 "REJECTED", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED))
+                                .findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED, pageable))
         );
 
 
@@ -108,26 +112,28 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsByOwnedAndState(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByOwnedAndState(Long userId, String state, Integer from, Integer size) {
         getUser(userId);
         LocalDateTime now = LocalDateTime.now();
 
+        Pageable pageable = PageRequest.of(from == 0 ? 0 : from / size, size);
+
         Map<String, Supplier<List<BookingDto>>> strategyMap = Map.of(
                 "ALL", () ->
-                        mapper.toListBookingDto(repository.findAllByItemOwnerIdOrderByStartDesc(userId)),
+                        mapper.toListBookingDto(repository.findAllByItemOwnerIdOrderByStartDesc(userId, pageable)),
                 "CURRENT", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now)),
+                                .findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now, pageable)),
                 "PAST", () ->
-                        mapper.toListBookingDto(repository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now)),
+                        mapper.toListBookingDto(repository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now, pageable)),
                 "FUTURE", () ->
-                        mapper.toListBookingDto(repository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now)),
+                        mapper.toListBookingDto(repository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now, pageable)),
                 "WAITING", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING)),
+                                .findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING, pageable)),
                 "REJECTED", () ->
                         mapper.toListBookingDto(repository
-                                .findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED))
+                                .findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED, pageable))
         );
 
 

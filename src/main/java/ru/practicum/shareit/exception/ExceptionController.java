@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -18,14 +19,15 @@ public class ExceptionController {
         return Map.of("error", e.getMessage());
     }
 
-    @ExceptionHandler({DuplicateException.class, NotSupportState.class})
+    @ExceptionHandler({NotSupportState.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleDuplicateException(final RuntimeException e) {
         log.error(e.getMessage());
         return Map.of("error", e.getMessage());
     }
 
-    @ExceptionHandler({NotAvailableException.class, BadBookingTimeException.class, NotBookedException.class})
+    @ExceptionHandler({NotAvailableException.class, BadBookingTimeException.class,
+            NotBookedException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleNotAvailableException(final RuntimeException e) {
         log.error(e.getMessage());

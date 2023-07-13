@@ -6,6 +6,7 @@ import lombok.Setter;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.util.CustomJsonFormat;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
@@ -14,16 +15,16 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class BookingDto {
-    private long id;
+    private Long id;
 
     @NotNull
     @FutureOrPresent
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = CustomJsonFormat.PATTERN)
     private LocalDateTime start;
 
     @NotNull
     @FutureOrPresent
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = CustomJsonFormat.PATTERN)
     private LocalDateTime end;
 
     @NotNull
