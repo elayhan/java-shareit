@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -21,10 +20,9 @@ public interface BookingMapper {
     @Mapping(target = "id", source = "bookingDto.id")
     Booking toBooking(BookingDto bookingDto, Item item, User user);
 
-    List<BookingDto> toListBookingDto(Collection<Booking> bookings);
+    List<BookingDto> toListBookingDto(List<Booking> bookings);
 
     @Mapping(target = "bookerId", source = "booker.id")
     BookingOwnerDto toBookingOwnerDto(Booking booking);
 
-    List<BookingOwnerDto> toListBookingOwnerDto(Collection<Booking> bookings);
 }
