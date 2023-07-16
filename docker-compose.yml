@@ -10,7 +10,6 @@ services:
       - POSTGRES_PASSWORD=shareit
       - POSTGRES_USER=shareit
       - POSTGRES_DB=shareit
-      - TZ=Europe/Moscow
     hostname: db
 
   server:
@@ -19,7 +18,6 @@ services:
     container_name: shareit-server
     ports:
       - "9090:9090"
-      - "8081:8081"
     depends_on:
       - db
     environment:
@@ -27,7 +25,6 @@ services:
       - SPRING_DATASOURCE_USERNAME=shareit
       - SPRING_DATASOURCE_PASSWORD=shareit
       - SERVER_PORT=9090
-      - TZ=Europe/Moscow
 
   gateway:
     build: gateway
@@ -40,4 +37,3 @@ services:
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
       - GATEWAY_PORT=8080
-      - TZ=Europe/Moscow
